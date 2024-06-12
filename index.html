@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Kakao 지도 시작하기</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- 검색어 부분 -->
+        <h2>관광 명소 검색</h2>
+        <form id="searchForm">
+            <input type="text" id="keyword" placeholder="검색어를 입력하세요" required />
+            <button type="submit">검색</button>
+        </form>
+
+        <!-- kakao map api를 통해 지도 구현 -->
+        <div id="map" style="width:800px;height:600px;"></div>
+        <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0c6932fce6eef079ab6ff619f0a9c38c"></script>
+        <script>
+            var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+                mapOption = {
+                    center: new kakao.maps.LatLng(37.5759, 126.97769), // StartingPoint: 광화문
+                    level: 3 // 지도의 확대 레벨
+                };
+
+            var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+            // 마커가 표시될 위치입니다 
+            var markerPosition = new kakao.maps.LatLng(37.5759, 126.9769);
+
+            // 마커를 생성합니다
+            var marker = new kakao.maps.Marker({
+                position: markerPosition
+            });
+
+            // 마커가 지도 위에 표시되도록 설정합니다
+            marker.setMap(map);
+        </script>
+    </div>
+</body>
+
+</html>
