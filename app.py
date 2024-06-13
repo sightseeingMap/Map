@@ -48,7 +48,7 @@ with app.app_context():
 @app.route("/get_sight_information/")
 def get_sight_information():
     # URL 설정
-    url = "https://apis.data.go.kr/B551011/KorService1/detailCommon1?serviceKey=Al3bMZYLF3tteWZUOulq/mqbqH09Whq3LSN7qXANeAop5MeLY6OMNFzt9xy4pbpDM9cvW4j6lxWxN8HDvhmSjg==&contentId=126508&defaultYN=Y&addrinfoYN=Y&overviewYN=Y&MobileOS=ETC&MobileApp=AppTest&_type=json"
+    url = "https://apis.data.go.kr/B551011/KorService1/detailCommon1?serviceKey=Al3bMZYLF3tteWZUOulq/mqbqH09Whq3LSN7qXANeAop5MeLY6OMNFzt9xy4pbpDM9cvW4j6lxWxN8HDvhmSjg==&contentId=126508&addrinfoYN=Y&overviewYN=Y&MobileOS=ETC&MobileApp=AppTest&_type=json"
     resp = requests.get(url)
     contents = resp.text
     print(contents)
