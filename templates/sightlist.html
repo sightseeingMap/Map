@@ -144,12 +144,13 @@
                         </div>
                         <div class="mb-3">
                             <div class="row row-cols-1 row-cols-md-4 g-4 mx-auto w-75 pb-5">
-                                {% for review in data %}
-                                <form action="{{ url_for('render_review_filter', sight=review.name) }}" method="POST">
+                                {% for review in data %} 
+                                <!-- review 고쳐야함 -->
+                                <form action="{{ url_for('render_review_filter', name=review.name) }}" method="POST">
                                     <div class="col">
                                         <div class="card h-100">
                                             <div class="card-body">
-                                                <!-- <input type="hidden" name="id" value="{{ song.id }}"> -->
+                                               
                                                 <h5 class="card-title">{{ review.rev_content }}</h5>
                                                 <p class="card-text">Review by {{ review.username }}</p>
                                                 <button type="submit" class="btn btn-danger" style="width: 100%;" >삭제</button>
