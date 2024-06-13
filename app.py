@@ -12,6 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 import requests, xmltodict , json 
 from flask import jsonify 
 
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] =\
@@ -30,7 +31,6 @@ class Reviews(db.Model):
     rev_id = db.Column(db.Integer, primary_key=True)
     userid = db.Column(db.String(100), nullable=False)
     username = db.Column(db.String(100), nullable=False)
-    sightid = db.Column(db.String(100), nullable=False)
     sightname = db.Column(db.String(100), nullable=False)
     rev_content = db.Column(db.String(10000), nullable=False)
 
@@ -48,28 +48,41 @@ import xmltodict
 import json
 
 app = Flask(__name__)
-
-@app.route("/get_sight_information/")
-def get_sight_information():
-    # URL 설정
-    url = "https://apis.data.go.kr/B551011/KorService1/detailCommon1?serviceKey=Al3bMZYLF3tteWZUOulq%2FmqbqH09Whq3LSN7qXANeAop5MeLY6OMNFzt9xy4pbpDM9cvW4j6lxWxN8HDvhmSjg%3D%3D&contentId=126508&addrinfoYN=Y&MobileOS=ETC&MobileApp=AppTest&_type=json"
-    resp = requests.get(url)
-    contents = resp.text
-    print(contents)
-    data = json.loads(contents)
-    title = data['response']['body']['items']['item'][0]['contentid']
-    print(title)
-
+@app.route("/sightlist/")
+def sightlist():
+    with open("sightdata.json", "r", encoding='UTF8') as sightdata:
+        data = json.load(sightdata)
+    keyword = request.args.get('keyword')
     
-    context = {
-        "title": title
-    }
-    return render_template('sightlist.html', data=context)
+    # 데이터를 필터링하지 않고 모든 데이터를 사용
+    sight_information = [{"name": item["관광지명"], "address": item["소재지도로명주소"], "information" : item["관광지소개"]} for item in data["records"]]
+    
+    return render_template('sightlist.html', data=sight_information)
 
-if __name__ == "__main__":
-    app.run(debug=True)
-
-
+@app.route("/sightlist_keyword/")
+def sightlist_keyword(): 
+    with open("sightdata.json", "r", encoding="utf-8") as file:
+        data = json.load(file)
+    keyword = request.args.get('keyword')
+    print(keyword)
+    # 키워드를 기반으로 데이터 필터링
+    filtered_data = []
+    for item in data["records"]:
+        if re.search(keyword, item["소재지도로명주소"]):
+            filtered_data.append({
+                "name": item["관광지명"], 
+                "address": item["소재지도로명주소"], 
+                "information": item["관광지소개"]
+            })
+    print(filtered_data)
+    # 필터링된 데이터를 sightlist.html에 전달하여 렌더링
+   # 필터링된 데이터를 HTML 형식으로 반환
+    html_table = "<table>"
+    html_table += "<tbody>"
+    for item in filtered_data:
+        html_table += f"<tr><td>{item['name']}</td><td>{item['address']}</td><td>{item['information']}</td><td><a href='#'>리뷰</a></td></tr>"
+    html_table += "</tbody></table>"
+    return html_table
 
 @app.route("/review/")
 def review_page():
@@ -77,9 +90,9 @@ def review_page():
     return render_template('review.html', data=reviews)
 
 
-@app.route("/review/<sightid>/")
-def render_review_filter(sightid):
-    filter_list = Reviews.query.filter_by(sightid=sightid).all()
+@app.route("/review/<name>/")
+def render_review_filter(name):
+    filter_list = Reviews.query.filter_by(name=name).all()
     return render_template('review.html', data=filter_list)
 
 
@@ -103,6 +116,5 @@ def review_create():
 
 
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
