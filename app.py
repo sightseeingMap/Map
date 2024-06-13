@@ -52,12 +52,19 @@ app = Flask(__name__)
 @app.route("/get_sight_information/")
 def get_sight_information():
     # URL 설정
-    url = "https://apis.data.go.kr/B551011/KorService1/detailCommon1?serviceKey=Al3bMZYLF3tteWZUOulq/mqbqH09Whq3LSN7qXANeAop5MeLY6OMNFzt9xy4pbpDM9cvW4j6lxWxN8HDvhmSjg==&contentId=126508&defaultYN=Y&addrinfoYN=Y&overviewYN=Y&MobileOS=ETC&MobileApp=AppTest&_type=json"
+    url = "https://apis.data.go.kr/B551011/KorService1/detailCommon1?serviceKey=Al3bMZYLF3tteWZUOulq%2FmqbqH09Whq3LSN7qXANeAop5MeLY6OMNFzt9xy4pbpDM9cvW4j6lxWxN8HDvhmSjg%3D%3D&contentId=126508&addrinfoYN=Y&MobileOS=ETC&MobileApp=AppTest&_type=json"
     resp = requests.get(url)
     contents = resp.text
     print(contents)
+    data = json.loads(contents)
+    title = data['response']['body']['items']['item'][0]['contentid']
+    print(title)
 
-    return render_template('sightlist.html', data=contents)
+    
+    context = {
+        "title": title
+    }
+    return render_template('sightlist.html', data=context)
 
 if __name__ == "__main__":
     app.run(debug=True)
