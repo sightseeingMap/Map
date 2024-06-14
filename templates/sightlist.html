@@ -320,21 +320,20 @@
                                 <th style="width: 40%;">관광지 소개</th>
                                 <th style="width: 10%;">리뷰</th>
                             </thead>
-                            <tbody>
-                                {% for item in data %}
-                                <tr>
-                                    <td>{{ item .name }}</td>
-                                    <td id="address" class="address">{{ item.address }}</td>
-                                    <td id="information">{{ item .information }}</td>
-                                    <td> <button type="button" class="btn btn-light" data-bs-toggle="modal"
-                                            data-bs-target="#exampleModal">
-                                            리뷰
-                                        </button></td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
+                            {% for item in data %}
+                            <tr>
+                                <td>{{ item.name }}</td>
+                                <td class="address" data-address="{{ item.address }}">{{ item.address }}</td>
+                                <td>{{ item.information }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-light open-modal" data-bs-toggle="modal"
+                                        data-bs-target="#exampleModal" data-name="{{ item.name }}">
+                                        리뷰
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
                         </table>
-[]
                     </body>
                 </div>
 
@@ -345,50 +344,33 @@
     </div>
 
 
-
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">관광지명</h1>
+                    <h1 class="modal-title fs-5" id="modalTitle"></h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="" method="GET">
+                    <form id="reviewForm" method="POST">
                         <div class="mb-3">
                             <div class="form-group">
-                                <label for="exampleFormControlTextarea1">리뷰를 남겨보세요 </label>
-                                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                                <input type="text" id="userid" value="aa">
+                                <input type="text" id="username" value="신애린">
+                                <label for="exampleFormControlTextarea1">리뷰를 남겨보세요</label>
+                                <textarea class="form-control" name="review_content" rows="3"
+                                    id="rev_content"></textarea>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <div class="row row-cols-1 row-cols-md-4 g-4 mx-auto w-75 pb-5">
-                                {% for review in data %}
-                                <!-- review 고쳐야함 -->
-                                <form action="{{ url_for('render_review_filter', name=review.name) }}" method="POST">
-                                    <div class="col">
-                                        <div class="card h-100">
-                                            <div class="card-body">
-
-                                                <h5 class="card-title">{{ review.rev_content }}</h5>
-                                                <p class="card-text">Review by {{ review.username }}</p>
-                                                <button type="submit" class="btn btn-danger"
-                                                    style="width: 100%;">삭제</button>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
-                                {% endfor %}
-
-                            </div>>
-                        </div>
+                        <input type="hidden" id="reviewName" name="name" value="">
                         <button type="submit" class="btn btn-dark">Submit</button>
                     </form>
                 </div>
             </div>
         </div>
+    </div>
+
     </div>
 
 
@@ -456,6 +438,65 @@
             const tableBody = document.querySelector("#sightTable tbody");
             tableBody.innerHTML = html_table; // HTML을 테이블 내용으로 설정
         }
+
+        //모달창 띄울때 필요한 속성
+        document.addEventListener("DOMContentLoaded", function () {
+            const openModalButtons = document.querySelectorAll(".open-modal");
+
+            openModalButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    const name = this.getAttribute("data-name");
+                    const modalTitle = document.getElementById("modalTitle");
+                    modalTitle.textContent = name; // 모달 제목을 관광지명으로 설정
+                    document.getElementById("reviewName").value = name; // hidden input에 관광지명 설정
+                });
+            });
+        });
+
+
+        // 리뷰 제출
+        document.addEventListener("DOMContentLoaded", function () {
+            const reviewForm = document.getElementById("reviewForm");
+
+            reviewForm.addEventListener("submit", function (event) {
+                event.preventDefault(); // 기본 제출 동작 방지
+
+                // Form 데이터 가져오기
+                const userid = document.getElementById("userid").value;
+                const username = document.getElementById("username").value;
+                const rev_content = document.getElementById("rev_content").value;
+                const reviewName = document.getElementById("reviewName").value;
+
+                console.log(userid, username, rev_content, reviewName)
+
+                // AJAX 요청 보내기
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "/review/create/", true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            // 성공적으로 요청이 완료된 경우
+                            console.log("Review submitted successfully!");
+                        } else {
+                            // 요청이 실패한 경우
+                            console.error("Failed to submit review.");
+                        }
+                    }
+                };
+
+                const data = {
+                    userid: userid,
+                    username: username,
+                    rev_content: rev_content,
+                    sightname: reviewName
+                };
+
+                console.log(data);
+                xhr.send(JSON.stringify(data));
+            });
+        });
 
     </script>
     <!-- 지도 구현 -->

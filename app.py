@@ -13,19 +13,16 @@ import requests, xmltodict , json
 from flask import jsonify 
 
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+
+
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] =\
-        'sqlite:///' + os.path.join(basedir, 'database.db')
 
 
-def mydefault():
-    global i
-    i += 1
-    return i
-
-
+basedir = os.path.abspath(os.path.dirname(__file__))
+# SQLAlchemy 초기화
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
+
 
 class Reviews(db.Model):
     rev_id = db.Column(db.Integer, primary_key=True)
@@ -96,23 +93,33 @@ def render_review_filter(name):
     return render_template('review.html', data=filter_list)
 
 
-@app.route("/review/create/")
+@app.route("/review/create/", methods=["POST"])
 def review_create():
-    # 폼에서 전달된 데이터 처리
-    sightname_receive = request.args.get("sightname")
-    userid_receive = request.args.get("userid")
-    username_receive = request.args.get("username")
-    sightid_receive = request.args.get("sightid")
-    rev_content_receive = request.args.get("rev_content")
+    try:
+        # 클라이언트로부터 JSON 형식의 데이터 가져오기
+        data = request.json
+        
+        # JSON 데이터가 제대로 전달되었는지 확인
+        if not data:
+            return "JSON data is missing or malformed", 400
 
-    # 데이터베이스에 데이터 추가
-    reviewdb = Reviews(sightname=sightname_receive, userid=userid_receive, username=username_receive, sightid=sightid_receive, rev_content=rev_content_receive)
-    db.session.add(reviewdb)
-    db.session.commit()
+        # 데이터베이스에 데이터 추가
+        reviewdb = Reviews(
+            sightname=data["sightname"],
+            userid=data["userid"],
+            username=data["username"],
+            rev_content=data["rev_content"]
+        )
+        db.session.add(reviewdb)
+        db.session.commit()
 
-    # 리뷰 페이지로 리다이렉트
-    return redirect(url_for('render_review_filter', sightname=sightname_receive))
-
+        # 리뷰 페이지로 리다이렉트
+        return redirect(url_for('render_review_filter', sightname=data["sightname"]))
+    except Exception as e:
+        # 예외 발생 시 콘솔에 출력
+        print("An error occurred:", e)
+        # 클라이언트에게 내부 서버 오류 메시지 반환
+        return "Internal Server Error", 500
 
 
 
