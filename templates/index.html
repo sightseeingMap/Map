@@ -3,210 +3,16 @@
 
 <head>
     <meta charset="utf-8">
-    <title>카테고리별 장소 검색하기</title>
-   <style>
-    .map_wrap,
-.map_wrap * {
-    margin: 0;
-    padding: 0;
-    font-family: 'Malgun Gothic', dotum, '돋움', sans-serif;
-    font-size: 12px;
-}
-
-.container {
-    position: absolute;
-    text-align: center;
-    top: 40px;
-    z-index: 2; 
-}
-
-.map_wrap {
-    position: relative;
-    width: 800px;
-    height: 600px;
-    margin: 0 auto;
-}
-
-body{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-
-    font-family: Arial, sans-serif;
-}
-
-
-
-#keyword {
-    width: 300px; 
-    height: 30px; 
-    font-size: 16px; 
-}
-
-button[type="submit"] {
-    height: 36px; 
-    font-size: 16px;
-    vertical-align: middle;
-}
-
-#category {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    border-radius: 5px;
-    border: 1px solid #909090;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
-    background: #fff;
-    overflow: hidden;
-    z-index: 2;
-}
-
-#category li {
-    float: left;
-    list-style: none;
-    width: 50px;
-    border-right: 1px solid #acacac;
-    padding: 6px 0;
-    text-align: center;
-    cursor: pointer;
-}
-
-#category li.on {
-    background: #eee;
-}
-
-#category li:hover {
-    background: #ffe6e6;
-    border-left: 1px solid #acacac;
-    margin-left: -1px;
-}
-
-#category li:last-child {
-    margin-right: 0;
-    border-right: 0;
-}
-
-#category li span {
-    display: block;
-    margin: 0 auto 3px;
-    width: 27px;
-    height: 28px;
-}
-
-#category li .category_bg {
-    background: url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_category.png) no-repeat;
-}
-
-#category li .bank {
-    background-position: -10px 0;
-}
-
-#category li .mart {
-    background-position: -10px -36px;
-}
-
-#category li .pharmacy {
-    background-position: -10px -72px;
-}
-
-#category li .oil {
-    background-position: -10px -108px;
-}
-
-#category li .cafe {
-    background-position: -10px -144px;
-}
-
-#category li .store {
-    background-position: -10px -180px;
-}
-
-#category li.on .category_bg {
-    background-position-x: -46px;
-}
-
-.placeinfo_wrap {
-    position: absolute;
-    bottom: 28px;
-    left: -150px;
-    width: 300px;
-}
-
-.placeinfo {
-    position: relative;
-    width: 100%;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 10px;
-    background: #fff;
-}
-
-.placeinfo:nth-of-type(n) {
-    border: 0;
-    box-shadow: 0px 1px 2px #888;
-}
-
-.placeinfo_wrap .after {
-    content: '';
-    position: relative;
-    margin-left: -12px;
-    left: 50%;
-    width: 22px;
-    height: 12px;
-    background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png')
-}
-
-.placeinfo a,
-.placeinfo a:hover,
-.placeinfo a:active {
-    color: #fff;
-    text-decoration: none;
-}
-
-.placeinfo a,
-.placeinfo span {
-    display: block;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.placeinfo span {
-    margin: 5px 5px 0 5px;
-    cursor: default;
-    font-size: 13px;
-}
-
-.placeinfo .title {
-    font-weight: bold;
-    font-size: 14px;
-    border-radius: 6px 6px 0 0;
-    margin: -1px -1px 0 -1px;
-    padding: 10px;
-    color: #fff;
-    background: #d95050;
-    background: #d95050 url(https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/arrow_white.png) no-repeat right 14px center;
-}
-
-.placeinfo .tel {
-    color: #0f7833;
-}
-
-.placeinfo .jibun {
-    color: #999;
-    font-size: 11px;
-    margin-top: 0;
-}
-
-   </style>
+    <title>관광여지도</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="icon" href="path_to_your_favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="path_to_your_favicon.ico" type="image/x-icon">
 </head>
 
 <body>
     <div class="container">
         <!-- 검색어 부분 -->
-        <h2>관광 명소 검색</h2>
+        <h2>도시 검색</h2>
         <form id="searchForm">
             <input type="text" id="keyword" placeholder="검색어를 입력하세요" required />
             <button type="submit">검색</button>
@@ -247,9 +53,6 @@ button[type="submit"] {
     <!-- 지도 구현 -->
     <script type="text/javascript"
         src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0c6932fce6eef079ab6ff619f0a9c38c&libraries=services"></script>
-
-
-        
     <script>
         // 마커를 클릭했을 때 해당 장소의 상세정보를 보여줄 커스텀오버레이
         var placeOverlay = new kakao.maps.CustomOverlay({ zIndex: 1 }),
@@ -362,22 +165,22 @@ button[type="submit"] {
                 imageSize = new kakao.maps.Size(27, 28),  // 마커 이미지의 크기
                 imgOptions = {
                     spriteSize: new kakao.maps.Size(72, 208), // 스프라이트 이미지의 크기
-                    spriteOrigin: new kakao.maps.Point(46, (order * 36)), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌표
-                    offset: new kakao.maps.Point(11, 28) // 마커 좌표에 일치시킬 이미지 내에서의 좌표
+                    spriteOrigin: new kakao.maps.Point(46, (order * 36)), // 스프라이트 이미지 중 사용할 영역의 좌상단 좌
+                    offset: new kakao.maps.Point(27, 28)  // 마커 이미지의 좌표 중심
                 },
                 markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions),
                 marker = new kakao.maps.Marker({
-                    position: position, // 마커의 위치
-                    image: markerImage
+                    position: position,  // 마커의 위치
+                    image: markerImage  // 마커 이미지
                 });
 
-            marker.setMap(map); // 지도 위에 마커를 표출
-            markers.push(marker);  // 배열에 생성된 마커를 추가
+            marker.setMap(map);  // 지도 위에 마커 표출
+            markers.push(marker);  // 배열에 생성된 마커 저장
 
             return marker;
         }
 
-        // 지도 위에 표시되고 있는 마커를 모두 제거
+        // 지도 위에 표시되고 있는 마커를 모두 제거하는 함수
         function removeMarker() {
             for (var i = 0; i < markers.length; i++) {
                 markers[i].setMap(null);
@@ -385,29 +188,33 @@ button[type="submit"] {
             markers = [];
         }
 
-        // 클릭한 마커에 대한 장소 상세정보를 커스텀 오버레이로 표시하는 함수
+        // 클릭한 마커의 장소명과 주소를 표출하는 함수
         function displayPlaceInfo(place) {
             var content = '<div class="placeinfo">' +
                 '   <a class="title" href="' + place.place_url + '" target="_blank" title="' + place.place_name + '">' + place.place_name + '</a>';
 
             if (place.road_address_name) {
                 content += '    <span title="' + place.road_address_name + '">' + place.road_address_name + '</span>' +
-                    '  <span class="jibun" title="' + place.address_name + '">(지번 : ' + place.address_name + ')</span>';
+                    '   <span class="jibun" title="' + place.address_name + '">' + place.address_name + '</span>';
             } else {
                 content += '    <span title="' + place.address_name + '">' + place.address_name + '</span>';
             }
 
             content += '    <span class="tel">' + place.phone + '</span>' +
-                '</div>' +
-                '<div class="after"></div>';
+                '</div>';
 
-            contentNode.innerHTML = content;
-            placeOverlay.setPosition(new kakao.maps.LatLng(place.y, place.x));
-            placeOverlay.setMap(map);
+            contentNode.innerHTML = content;  // 커스텀 오버레이의 컨텐츠 엘리먼트에 컨텐츠를 추가
+            placeOverlay.setPosition(new kakao.maps.LatLng(place.y, place.x));  // 커스텀 오버레이가 표시될 위치
+            placeOverlay.setMap(map);  // 지도에 커스텀 오버레이 추가
         }
 
+        // 카테고리를 클릭했을 때 카테고리 값을 받아와 검색을 요청하는 함수
+        function selectCategory(category) {
+            currCategory = category;  // 현재 선택된 카테고리 갱신
+            searchPlaces();  // 검색 함수 호출
+        }
 
-        // 각 카테고리에 클릭 이벤트를 등록
+        // 각 카테고리에 클릭 이벤트를 등록하는 함수
         function addCategoryClickEvent() {
             var category = document.getElementById('category'),
                 children = category.children;
@@ -426,52 +233,21 @@ button[type="submit"] {
 
             if (className === 'on') {
                 currCategory = '';
-                changeCategoryClass();
-                removeMarker();
+                this.className = '';
             } else {
-                currCategory = id;
-                changeCategoryClass(this);
-                searchPlaces();
-            }
-        }
-
-        // 클릭된 카테고리에만 클릭된 스타일을 적용하는 함수
-        function changeCategoryClass(el) {
-            var category = document.getElementById('category'),
-                children = category.children,
-                i;
-
-            for (i = 0; i < children.length; i++) {
-                children[i].className = '';
-            }
-
-            if (el) {
-                el.className = 'on';
-            }
-        }
-        // 검색 이벤트 핸들러
-        document.getElementById('searchForm').addEventListener('submit', function (event) {
-            event.preventDefault(); // 기본 제출 동작 방지
-
-            var keyword = document.getElementById('keyword').value; // 검색어 가져오기
-
-            // Kakao 지도 API의 장소 검색 서비스를 이용하여 검색어에 해당하는 좌표 가져오기
-            var geocoder = new kakao.maps.services.Geocoder();
-            geocoder.addressSearch(keyword, function (result, status) { // addressSearch()함수를 이용해 keyword에 해당하는 좌표를 검색하고 완료되면 콜백 함수가 호출
-                if (status === kakao.maps.services.Status.OK) {
-                    var coords = new kakao.maps.LatLng(result[0].y, result[0].x); // 검색된 좌표
-
-                    // 검색된 위치로 지도 이동 및 확대 레벨 설정
-                    map.setCenter(coords);
-                    map.setLevel(5); // 원하는 확대 레벨로 조정
-
-                    // 마커 위치 변경
-                    marker.setPosition(coords);
-                } else {
-                    alert('검색된 위치를 찾을 수 없습니다.');
+                for (var i = 0; i < document.getElementById('category').children.length; i++) {
+                    document.getElementById('category').children[i].className = '';
                 }
-            });
-        });
+                this.className = 'on';
+                selectCategory(id);
+            }
+        }
+
+        // 검색창 제출 시 이벤트 핸들러
+        document.getElementById('searchForm').onsubmit = function (e) {
+            e.preventDefault();  // 폼 제출 기본 동작 방지
+            searchPlaces();  // 검색 함수 호출
+        };
     </script>
 </body>
 
