@@ -7,5 +7,5 @@
 ![image](https://github.com/sightseeingMap/Map/assets/88620992/cbd9a2dd-cd5f-4fa0-bc87-d67db9388fee)
 
 # 카테고리 클릭 시 검색어 주변 편의 시설 마커 표시 
-ex) 검색어 입력란 : 서울 -> 카테고리 : 편의점
+# ex) 검색어 입력란 : 서울 -> 카테고리 : 편의점
 ![image](https://github.com/sightseeingMap/Map/assets/88620992/a692df0d-eeea-4479-9ead-ce75da571974)
