@@ -80,7 +80,7 @@ def sightlist_keyword():
     html_table = "<table>"
     html_table += "<tbody>"
     for item in filtered_data:
-        html_table += f"<tr><td>{item['name']}</td><td>{item['address']}</td><td>{item['information']}</td><td><a href='#'>리뷰</a></td></tr>"
+        html_table += f"<tr><td id=\"name\">{item['name']}</td><td id=\"address\" class=\"address\">{item['address']}</td><td id=\"information\">{item['information']}</td><td> <button type=\"button\" class=\"btn btn-light\" data-bs-toggle=\"modal\" data-bs-target=\"#exampleModal\">리뷰</button></td></tr>"
     html_table += "</tbody></table>"
     return html_table
 

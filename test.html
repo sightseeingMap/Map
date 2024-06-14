@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>관광여지도</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- 검색어 부분 -->
+        <h2>관광 명소 검색</h2>
+        <form id="searchForm">
+            <input type="text" id="keyword" placeholder="검색어를 입력하세요" required />
+            <button type="submit">검색</button>
+        </form>
+
+        <!-- kakao map api를 통해 지도 구현 -->
+        <div id="map" style="width:800px;height:600px;"></div>
+        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=0c6932fce6eef079ab6ff619f0a9c38c&libraries=services"></script>
+        <script>
+            var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+                mapOption = {
+                    center: new kakao.maps.LatLng(37.5759, 126.97769), // StartingPoint: 광화문
+                    level: 5 // 지도의 확대 레벨 (조정)
+                };
+
+            var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성
+
+            var marker = new kakao.maps.Marker({ // 마커를 생성
+                position: mapOption.center, // 초기 위치는 지도 중심
+                draggable: true,
+                map: map // 마커를 표시할 지도 객체
+            });
+
+            // 관광지 마커를 저장할 배열
+            var touristMarkers = [];
+
+            // 공공데이터 API를 통해 관광지 정보를 가져오는 함수
+            function fetchTouristSpots(keyword) {
+                var apiKey = 'CA/BPiltNoKw35qYxT4HLnCqFFvr+UjaZYXNKXEq/Y5fb6URiDqjBYG/4gTvVx1nRKMeO0rsRRv0ABVGyP743w=='; // 여기에 공공데이터 API 키를 입력하세요
+                var encodedKeyword = encodeURIComponent(keyword);
+                var apiUrl = `https://apis.data.go.kr/B551011/KorService1/searchKeyword1?serviceKey=${encodeURIComponent(apiKey)}&MobileApp=AppTest&MobileOS=ETC&pageNo=1&numOfRows=10&listYN=Y&arrange=A&contentTypeId=12&keyword=${encodedKeyword}&_type=json`;
+
+                fetch(apiUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.response && data.response.body && data.response.body.items && data.response.body.items.item) {
+                            var spots = data.response.body.items.item;
+                            displayTouristSpots(spots);
+                        } else {
+                            alert('주변 관광지를 찾을 수 없습니다.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching tourist spots:', error);
+                    });
+            }
+
+            // 관광지 마커를 지도에 표시하는 함수
+            function displayTouristSpots(spots) {
+                // 기존 마커 제거
+                touristMarkers.forEach(function(marker) {
+                    marker.setMap(null);
+                });
+                touristMarkers = [];
+
+                spots.forEach(function(spot) {
+                    var coords = new kakao.maps.LatLng(spot.mapy, spot.mapx);
+                    var marker = new kakao.maps.Marker({
+                        position: coords,
+                        map: map,
+                        title: spot.title
+                    });
+                    touristMarkers.push(marker);
+
+                    // 마커 클릭 이벤트 추가
+                    kakao.maps.event.addListener(marker, 'click', function() {
+                        var infowindow = new kakao.maps.InfoWindow({
+                            content: `<div style="padding:5px;">${spot.title}<br>${spot.addr1}</div>`
+                        });
+                        infowindow.open(map, marker);
+                    });
+                });
+            }
+
+            // 검색 이벤트 핸들러
+            document.getElementById('searchForm').addEventListener('submit', function(event) {
+                event.preventDefault(); // 기본 제출 동작 방지
+
+                var keyword = document.getElementById('keyword').value; // 검색어 가져오기
+
+                // Kakao 지도 API의 장소 검색 서비스를 이용하여 검색어에 해당하는 좌표 가져오기
+                var geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(keyword, function(result, status) { // addressSearch()함수를 이용해 keyword에 해당하는 좌표를 검색하고 완료되면 콜백 함수가 호출
+                    if (status === kakao.maps.services.Status.OK) {
+                        var coords = new kakao.maps.LatLng(result[0].y, result[0].x); // 검색된 좌표
+
+                        // 검색된 위치로 지도 이동 및 확대 레벨 설정
+                        map.setCenter(coords);
+                        map.setLevel(7); // 원하는 확대 레벨로 조정
+
+                        // 마커 위치 변경
+                        marker.setPosition(coords);
+
+                        // 관광지 정보 가져오기
+                        fetchTouristSpots(keyword);
+                    } else {
+                        alert('검색된 위치를 찾을 수 없습니다.');
+                    }
+                });
+            });
+        </script>
+    </div>
+</body>
+
+</html>
