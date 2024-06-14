@@ -15,7 +15,29 @@
 
         #reviewmain {
             display: flex;
-            justify-content: space-evenly;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        a {
+            color: rgb(0 0 0);
+            text-decoration: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
         }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
@@ -42,43 +64,58 @@
                             <li class="nav-item">
                                 <a class="nav-link  " aria-current="page" href="#">Home</a>
                             </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link  " href="#">Album</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link  ">Movie</a>
-                            </li>
                         </ul>
                     </div>
                 </div>
             </nav>
         </nav>
 
-        <div class="px-4 py-5 my-5 text-center">
+        <div class=" text-center">
             <!-- 여기도 reviews가 아니라 sight가 와야함 -->
-            <h1 class="display-5 fw-bold text-body-emphasis"> 관광지 list </h1>
-            <div class="col-lg-6 mx-auto mt-5" id="reviewmain">
+            <h1 class="py-3 display-5 fw-bold text-body-emphasis">🗺관광여지도🔎</h1><br>
+            <form id="searchForm" action="/sightlist_keyword/" method="GET">
+                <div style="display: flex;justify-content: center  ">
+                    <input type="text" class="form-control" style="width: 400px; margin-right: 30px;" id="keyword"
+                        placeholder="검색어를 입력하세요" required />
+                    <button class="btn btn-dark" type="submit" id="search">검색</button>
+                </div>
+            </form>
+
+            <div class="col-lg-18 mx-auto mt-5" id="reviewmain">
                 <div style="width: 300px; height: 300px; background-color: gray;">
                     <!-- 지도 -->
-                    <img src="">
+                    <div id="map"></div>
                 </div>
-                <div style="display: flex; flex-direction: column;">
+                <div
+                    style="display: flex; flex-direction: column; width: 900px;   max-height: 400px; overflow-y: auto;">
 
-                    <button type="button" class="btn btn-dark" style="height: 40px;" onclick="getSightInformation()">
-                        info
-                    </button>
+                    <body>
+                        <table id="sightTable">
+                            <thead style="   position: sticky;  top: 0;  z-index: 1; ">
+                                <th style="width: 15%;">관광지명</th>
+                                <th style="width: 35%;">관광지 주소</th>
+                                <th style="width: 40%;">관광지 소개</th>
+                                <th style="width: 10%;">리뷰</th>
+                            </thead>
+                            <tbody>
+                                {% for item in data %}
+                                <tr>
+                                    <td><a href="#" id="name">{{ item .name }}</a></td>
+                                    <td id="address">{{ item .address }}</td>
+                                    <td id="information">{{ item .information }}</td>
+                                    <td> <button type="button" class="btn btn-light" data-bs-toggle="modal"
+                                            data-bs-target="#exampleModal">
+                                            리뷰
+                                        </button></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
 
-                    <table id="sightTable">
-                        <thead>
-                            <tr>
-                                <th>Title</th>
-                                <th>Address</th>
-                                <th>Homepage</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
+
+                        <div class="pagination" id="pagination"></div>
+
+                    </body>
                 </div>
 
 
@@ -88,6 +125,50 @@
     </div>
 
 
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">관광지명</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="GET">
+                        <div class="mb-3">
+                            <div class="form-group">
+                                <label for="exampleFormControlTextarea1">리뷰를 남겨보세요 </label>
+                                <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                              </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="row row-cols-1 row-cols-md-4 g-4 mx-auto w-75 pb-5">
+                                {% for review in data %} 
+                                <!-- review 고쳐야함 -->
+                                <form action="{{ url_for('render_review_filter', name=review.name) }}" method="POST">
+                                    <div class="col">
+                                        <div class="card h-100">
+                                            <div class="card-body">
+                                               
+                                                <h5 class="card-title">{{ review.rev_content }}</h5>
+                                                <p class="card-text">Review by {{ review.username }}</p>
+                                                <button type="submit" class="btn btn-danger" style="width: 100%;" >삭제</button>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                {% endfor %}            
+                    
+                            </div>>
+                        </div>
+                        <button type="submit" class="btn btn-dark">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
     </div>
@@ -108,35 +189,50 @@
         </footer>
     </div>
     <script>
-        function getSightInformation() {
-            fetch('get_sight_information')
-                .then(response => response.json())
+        document.addEventListener("DOMContentLoaded", function () {
+            // 검색 버튼 클릭 이벤트 처리
+            document.getElementById("search").addEventListener("click", function () {
+                var keyword = document.getElementById("keyword").value.trim(); // 입력된 키워드 가져오기
+                fetchData(keyword); // 데이터 요청 함수 호출
+            });
+
+            // 검색 양식 제출 이벤트 처리
+            document.getElementById("searchForm").addEventListener("submit", function (event) {
+                event.preventDefault(); // 기본 제출 동작 방지
+                var keyword = document.getElementById("keyword").value.trim(); // 입력된 키워드 가져오기
+                fetchData(keyword); // 데이터 요청 함수 호출
+
+                // URL 변경
+                var url = "/sightlist_keyword/?keyword=" + encodeURIComponent(keyword);
+                history.pushState({}, null, url);
+                const tableBody = document.querySelector("#sightTable tbody");
+                tableBody.innerHTML = ""; // 테이블 내용 초기화
+
+            });
+        });
+
+        function fetchData(keyword) {
+            fetch("/sightlist_keyword/?keyword=" + keyword) // Flask 앱의 라우팅 경로에 키워드 전달
+                .then(response => response.text()) // HTML 형식으로 응답을 받음
                 .then(data => {
-                    console.log(data);
-                    // JSON 데이터를 받아와서 테이블에 추가
-                    const table = document.getElementById('get_sight_information').getElementsByTagName('tbody')[0]; // 테이블 선택
-
-                    // 테이블 초기화
-                    table.innerHTML = '';
-
-                    // 받아온 데이터를 테이블에 추가
-                    const row = table.insertRow();
-                    const cell1 = row.insertCell(0);
-                    const cell2 = row.insertCell(1);
-                    const cell3 = row.insertCell(2);
-                    const cell4 = row.insertCell(3);
-
-                    cell1.textContent = data.title;
-                    cell2.textContent = data.address;
-                    cell3.textContent = data.homepage;
-                    cell4.textContent = data.overview;
+                    displayData(data); // 데이터 표시 함수 호출
                 })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
+                .catch(error => console.error('데이터를 불러오는 중 에러 발생:', error));
         }
 
+        function displayData(html_table) {
+            const tableBody = document.querySelector("#sightTable tbody");
+            tableBody.innerHTML = html_table; // HTML을 테이블 내용으로 설정
+        }
+
+
+
+
+
+
     </script>
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
